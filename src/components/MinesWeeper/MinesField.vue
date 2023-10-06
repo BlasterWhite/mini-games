@@ -1,13 +1,5 @@
 <script setup>
-import { computed, ref } from "vue";
-
-// TODO: add a function to reset the game
-// TODO: color the number of mines around the cell
-// TODO: add a timer
-// TODO: add local storage to save the best time
-// TODO: add Animation
-// TODO: add settings
-// TODO: add Confetti when win
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
   height: {
@@ -26,19 +18,13 @@ const props = defineProps({
     type: Number,
     default: 30,
   },
+  restartTheGame: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const widthCss = computed(() => {
-  return {
-    width: `repeat(${props.width}, 1fr)`,
-  };
-});
-
-const heightCss = computed(() => {
-  return {
-    height: `repeat(${props.height}, 1fr)`,
-  };
-});
+const emits = defineEmits(["update:restartTheGame"]);
 
 const tileCss = computed(() => {
   return `${props.tileSizes}px`;
@@ -51,10 +37,13 @@ const playGround = computed(() => {
 });
 
 const numberOfMines = ref(0);
+
+/**
+ * Generate mines
+ */
 function generateMines() {
   numberOfMines.value = 0;
   const mines = Math.round(props.width * props.height * props.minesPercent);
-  console.log(mines);
   for (let i = 0; i < mines; i++) {
     const x = Math.floor(Math.random() * props.width);
     const y = Math.floor(Math.random() * props.height);
@@ -67,6 +56,12 @@ function generateMines() {
   }
 }
 
+/**
+ *
+ * @param {number} x
+ * @param {number} y
+ * @returns {number}
+ */
 function calculMineAround(x, y) {
   let mines = 0;
   for (let i = -1; i <= 1; i++) {
@@ -89,6 +84,9 @@ function calculMineAround(x, y) {
   return mines;
 }
 
+/**
+ * Calculate the number of mines around each cell
+ */
 function calculAllMinesAround() {
   for (let y = 0; y < props.height; y++) {
     for (let x = 0; x < props.width; x++) {
@@ -101,9 +99,6 @@ function calculAllMinesAround() {
   }
 }
 
-generateMines();
-calculAllMinesAround();
-
 /**
  * Reveal a cell
  * @param {number} x
@@ -111,7 +106,6 @@ calculAllMinesAround();
  * @param {Event} event
  */
 function reveal(x, y, event) {
-  console.log(x, y, event);
   if (playGround.value[y][x] === -2 || event.target.innerText === "💣") {
     return;
   }
@@ -163,6 +157,53 @@ function calculVictory() {
     alert("You win");
   }
 }
+
+watch(
+  () => props.height,
+  () => {
+    generateMines();
+    calculAllMinesAround();
+  },
+);
+
+watch(
+  () => props.width,
+  () => {
+    generateMines();
+    calculAllMinesAround();
+  },
+);
+
+watch(
+  () => props.minesPercent,
+  () => {
+    generateMines();
+    calculAllMinesAround();
+  },
+);
+
+watch(
+  () => props.restartTheGame,
+  () => {
+    restart();
+    emits("update:restartTheGame", false);
+  },
+);
+
+function restart() {
+  console.log("restart !!")
+  document.querySelectorAll(".cell").forEach((cell) => {
+    cell.classList.remove("revealed");
+    cell.classList.remove("revealedDark");
+    cell.innerText = "";
+    cell.style.backgroundColor = "";
+  });
+  generateMines();
+  calculAllMinesAround();
+}
+
+generateMines();
+calculAllMinesAround();
 </script>
 
 <template>

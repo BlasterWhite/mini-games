@@ -1,10 +1,9 @@
 <script setup>
-import MinesWeeper from "./components/MinesWeeper.vue";
+import { RouterView } from "vue-router";
 </script>
 
 <template>
-  <h1>Mini games</h1>
-  <MinesWeeper :width="8" :height="7" :mines-percent="0.1" :tile-sizes="50" />
+  <RouterView />
 </template>
 
 <style scoped></style>
