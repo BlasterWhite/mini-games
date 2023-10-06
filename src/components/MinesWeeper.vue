@@ -1,5 +1,5 @@
 <script setup>
-import {computed, ref} from "vue";
+import { computed, ref } from "vue";
 
 // TODO: add a function to reset the game
 // TODO: color the number of mines around the cell
@@ -8,7 +8,6 @@ import {computed, ref} from "vue";
 // TODO: add Animation
 // TODO: add settings
 // TODO: add Confetti when win
-
 
 const props = defineProps({
   height: {
@@ -28,7 +27,6 @@ const props = defineProps({
     default: 30,
   },
 });
-
 
 const widthCss = computed(() => {
   return {
@@ -56,11 +54,11 @@ const numberOfMines = ref(0);
 function generateMines() {
   numberOfMines.value = 0;
   const mines = Math.round(props.width * props.height * props.minesPercent);
-  console.log(mines)
+  console.log(mines);
   for (let i = 0; i < mines; i++) {
     const x = Math.floor(Math.random() * props.width);
     const y = Math.floor(Math.random() * props.height);
-    if(playGround.value[y][x] === -1) {
+    if (playGround.value[y][x] === -1) {
       i--;
       continue;
     }
@@ -71,12 +69,16 @@ function generateMines() {
 
 function calculMineAround(x, y) {
   let mines = 0;
-  for (let i = -1; i <= 1; i++) { // loop around the cell row
-    if (y + i < 0 || y + i >= props.height) { // out of bound
+  for (let i = -1; i <= 1; i++) {
+    // loop around the cell row
+    if (y + i < 0 || y + i >= props.height) {
+      // out of bound
       continue;
     }
-    for (let j = -1; j <= 1; j++) { // loop around the cell column
-      if (x + j < 0 || x + j >= props.width) { // out of bound
+    for (let j = -1; j <= 1; j++) {
+      // loop around the cell column
+      if (x + j < 0 || x + j >= props.width) {
+        // out of bound
         continue;
       }
       if (playGround.value[y + i][x + j] === -1) {
@@ -90,7 +92,8 @@ function calculMineAround(x, y) {
 function calculAllMinesAround() {
   for (let y = 0; y < props.height; y++) {
     for (let x = 0; x < props.width; x++) {
-      if (playGround.value[y][x] === -1) { // if it's a mine, skip
+      if (playGround.value[y][x] === -1) {
+        // if it's a mine, skip
         continue;
       }
       playGround.value[y][x] = calculMineAround(x, y);
@@ -108,7 +111,7 @@ calculAllMinesAround();
  * @param {Event} event
  */
 function reveal(x, y, event) {
-  console.log(x, y , event)
+  console.log(x, y, event);
   if (playGround.value[y][x] === -2 || event.target.innerText === "💣") {
     return;
   }
@@ -131,7 +134,7 @@ function reveal(x, y, event) {
  */
 function declareMine(x, y, event) {
   event.preventDefault();
-  if(event.target.innerText === "💣") {
+  if (event.target.innerText === "💣") {
     event.target.innerText = "";
     event.target.style.backgroundColor = "";
     numberOfMines.value++;
@@ -147,7 +150,8 @@ function calculVictory() {
   let victory = true;
   for (let y = 0; y < props.height; y++) {
     for (let x = 0; x < props.width; x++) {
-      if (playGround.value[y][x] === -1) { // if it's a mine, skip
+      if (playGround.value[y][x] === -1) {
+        // if it's a mine, skip
         continue;
       }
       if (playGround.value[y][x] !== -2) {
@@ -159,24 +163,21 @@ function calculVictory() {
     alert("You win");
   }
 }
-
 </script>
 
 <template>
-  Mines: {{numberOfMines}} 💣<br>
+  Mines: {{ numberOfMines }} 💣<br />
   <div class="minesweeper">
-     <div v-for="(row, indexRow) in playGround" class="row">
-       <div class="cell" :class="((indexRow + indexCell) % 2) ? 'darkgreen' : 'green' "
-            v-for="(cell, indexCell) in row"
-            @click="reveal(indexCell, indexRow, $event)"
-            @contextmenu="declareMine(indexCell, indexRow, $event)"
-       >
-
-       </div>
-     </div>
-
+    <div v-for="(row, indexRow) in playGround" class="row">
+      <div
+        class="cell"
+        :class="(indexRow + indexCell) % 2 ? 'darkgreen' : 'green'"
+        v-for="(cell, indexCell) in row"
+        @click="reveal(indexCell, indexRow, $event)"
+        @contextmenu="declareMine(indexCell, indexRow, $event)"
+      ></div>
+    </div>
   </div>
-
 </template>
 
 <style>
@@ -213,15 +214,15 @@ div.cell:not(.revealed):hover {
 }
 </style>
 <style>
-  .minesweeper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
+.minesweeper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 
-  .row {
-    display: flex;
-    flex-direction: row;
-  }
+.row {
+  display: flex;
+  flex-direction: row;
+}
 </style>
